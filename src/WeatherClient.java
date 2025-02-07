@@ -40,37 +40,5 @@ public class WeatherClient extends Client {
         // String weatherString = weatherSerialization.serialize(weatherData);
         // String myCoolMsg = buildMessage(CLIENT_REQUEST_SPECIFIC, cityString);
 
-        String[] msgParts = pMessage.split(SEPARATOR);
-        switch (msgParts[0]) {
-            case SERVER_GREETING -> send(CLIENT_REQUEST_RANDOM);
-            case SERVER_ANSWER_RANDOM -> {
-                System.out.println("Aufgabe 1");
-                City city = citySerialization.deserialize(msgParts[1]);
-                WeatherData weatherData = weatherSerialization.deserialize(msgParts[2]);
-                System.out.println(city);
-                System.out.println(weatherData);
-
-                String dortmund = citySerialization.serialize(new City("Dortmund"));
-                send(buildMessage(CLIENT_REQUEST_SPECIFIC, dortmund));
-            }
-            case SERVER_ANSWER_SPECIFIC -> {
-                System.out.println("Aufgabe 2");
-                WeatherData weatherData = weatherSerialization.deserialize(msgParts[1]);
-                System.out.println(weatherData);
-
-                send(CLIENT_REQUEST_CITIES);
-            }
-            case SERVER_ANSWER_CITIES -> {
-                System.out.println("Aufgabe 3");
-                List<City> cities = new List<>();
-                for (int i = 1; i < msgParts.length; i++) {
-                    City city = citySerialization.deserialize(msgParts[i]);
-                    cities.append(city);
-                    System.out.println(city);
-                }
-
-                close();
-            }
-        }
     }
 }
