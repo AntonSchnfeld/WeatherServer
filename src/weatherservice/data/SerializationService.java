@@ -1,4 +1,4 @@
-package weatherservice;
+package weatherservice.data;
 
 /**
  * Ein generisches Interface für die Serialisierung und Deserialisierung von Objekten.

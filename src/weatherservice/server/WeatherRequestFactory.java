@@ -1,4 +1,6 @@
-package weatherservice;
+package weatherservice.server;
+
+import weatherservice.WeatherProtocol;
 
 public class WeatherRequestFactory {
 

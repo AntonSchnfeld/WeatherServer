@@ -1,4 +1,4 @@
-package weatherservice;
+package weatherservice.data;
 
 import org.json.JSONObject;
 

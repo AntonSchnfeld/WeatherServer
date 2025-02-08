@@ -1,7 +1,6 @@
 import netzklassen.Client;
-import netzklassen.List;
-import weatherservice.*;
-import static weatherservice.WeatherProtocol.*;
+import weatherservice.WeatherProtocol;
+import weatherservice.data.*;
 
 /**
  * Ein Client zur Kommunikation mit einem Wetterserver, der Wetterdaten und Städteinformationen anfordert.

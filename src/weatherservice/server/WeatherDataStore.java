@@ -1,7 +1,10 @@
-package weatherservice;
+package weatherservice.server;
 
-import java.util.Map;
+import weatherservice.data.City;
+import weatherservice.data.WeatherData;
+
 import java.util.HashMap;
+import java.util.Map;
 
 public class WeatherDataStore {
     private final Map<City, WeatherData> weatherDataMap;

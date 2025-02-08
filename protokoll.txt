@@ -1,2 +1,2 @@
-Protokoll weatherservice.WeatherServer
+Protokoll weatherservice.server.WeatherServer
 

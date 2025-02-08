@@ -1,4 +1,4 @@
-package weatherservice;
+package weatherservice.data;
 
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;

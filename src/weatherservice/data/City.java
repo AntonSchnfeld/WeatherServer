@@ -1,4 +1,4 @@
-package weatherservice;
+package weatherservice.data;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class City {
     /** Liste der möglichen Städtenamen für zufällige Auswahl. */
-    protected static final String[] CITY_NAMES = {
+    public static final String[] CITY_NAMES = {
             "Duisburg", "Dortmund", "Berlin", "Bochum", "Aachen", "Affel",
             "Gladbeck", "Remscheid", "Potsdam", "Warschau", "Kiew", "London",
             "Washington DC", "New York", "Paris", "Venedig"

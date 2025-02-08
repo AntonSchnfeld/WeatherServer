@@ -1,4 +1,4 @@
-package weatherservice;
+package weatherservice.server;
 
 import java.util.Arrays;
 
