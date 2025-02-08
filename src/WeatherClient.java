@@ -3,42 +3,46 @@ import netzklassen.List;
 import weatherservice.*;
 import static weatherservice.WeatherProtocol.*;
 
+/**
+ * Ein Client zur Kommunikation mit einem Wetterserver, der Wetterdaten und Städteinformationen anfordert.
+ */
 public class WeatherClient extends Client {
 
+    /** Serialisierungsservice für Wetterdaten. */
     private final SerializationService<WeatherData> weatherSerialization;
+
+    /** Serialisierungsservice für Städte. */
     private final SerializationService<City> citySerialization;
 
+    /**
+     * Erstellt einen neuen Wetter-Client und verbindet sich mit dem Server.
+     *
+     * @param pServerIP   Die IP-Adresse des Wetterservers.
+     * @param pServerPort Der Port des Wetterservers.
+     */
     public WeatherClient(String pServerIP, int pServerPort) {
         super(pServerIP, pServerPort);
         weatherSerialization = new WeatherDataSerializationService();
         citySerialization = new CitySerializationService();
     }
 
+    /**
+     * Verarbeitet eingehende Nachrichten vom Server und führt verschiedene Anfragen aus:
+     * <ol>
+     *     <li>Fordert zufälliges Wetter an, wandelt die Daten in Objekte um und gibt sie aus.</li>
+     *     <li>Fordert das Wetter in Dortmund an, wandelt es um und gibt es aus.</li>
+     *     <li>Fordert alle verfügbaren Städte an, speichert sie in einer Liste und gibt sie aus.</li>
+     *     <li>Beendet die Verbindung mit dem Server.</li>
+     * </ol>
+     *
+     * Tipp: Die Methoden {@link SerializationService#deserialize(String)} und
+     * {@link SerializationService#serialize(Object)} helfen bei der Umwandlung von JSON-Daten.
+     * Die Methode {@link WeatherProtocol#buildMessage(String...)} erleichtert das Erstellen von Nachrichten.
+     *
+     * @param pMessage Die empfangene Nachricht vom Server.
+     */
     @Override
     public void processMessage(String pMessage) {
-        // TODO: Implementationsaufgabe
-        // 1. Zufälliges Wetter anfordern und sowohl Wetter als auch Stadt
-        // in WeatherData und City-Objekte umwandeln, diese dann ausgeben
-        // 2. Wetter in Dortmund anfordern und in ein WeatherData-Objekt
-        // umwandeln, dieses ausgeben
-        // 3. Alle Städte anfordern und diese alle in eine List<City> speichern,
-        // dann alle Einträge ausgeben
-        // 4. Die Verbindung mit dem Server beenden
-
-        // Tipp: Benutze weatherSerialization,
-        // um den Wetterstring des Servers in
-        // ein WeatherData-Objekt umzuwandeln.
-        // Genauso kannst du citySerialization benutzen,
-        // um Stadtstrings in City-Objekte umzuwandeln.
-        // Außerdem kannst du die Methode buildMessage benutzen,
-        // um automatisch den SEPARATOR zwischen die einzelnen
-        // Teile deiner Nachricht zu stecken
-        // Beispiele:
-        // City city = citySerialization.deserialize(messagePart[i]);
-        // String cityString = citySerialization.serialize(city);
-        // WeatherData weatherData = weatherSerialization.deserialize(messagePart[i]);
-        // String weatherString = weatherSerialization.serialize(weatherData);
-        // String myCoolMsg = buildMessage(CLIENT_REQUEST_SPECIFIC, cityString);
-
+        // TODO: Implementieren der beschriebenen Schritte
     }
 }
