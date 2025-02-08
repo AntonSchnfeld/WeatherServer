@@ -1,5 +1,7 @@
 package weatherservice;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Repräsentiert eine Stadt mit einem Namen.
  * Falls kein Name angegeben wird, wird ein zufälliger Name aus einer vordefinierten Liste gewählt.
@@ -18,7 +20,7 @@ public class City {
      * @return Ein zufällig gewählter Städtename.
      */
     protected static String getRandomCityName() {
-        return CITY_NAMES[(int) Math.round(Math.random() * (CITY_NAMES.length - 1))];
+        return CITY_NAMES[ThreadLocalRandom.current().nextInt(CITY_NAMES.length)];
     }
 
     /** Der Name der Stadt. */

@@ -1,6 +1,7 @@
 package weatherservice;
 
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Repräsentiert Wetterdaten für einen bestimmten Zeitpunkt, einschließlich Temperatur,
@@ -32,9 +33,9 @@ public class WeatherData {
      */
     public WeatherData() {
         date = new Date();
-        description = DESCRIPTION[(int) Math.round(Math.random() * (DESCRIPTION.length - 1))];
-        temperature = ((int) (Math.random() * 70)) - 35; // Temperatur zwischen -35°C und 35°C
-        amount = (int) (Math.random() * 100); // Niederschlagsmenge zwischen 0 und 100 mm
+        description = DESCRIPTION[ThreadLocalRandom.current().nextInt(DESCRIPTION.length)];
+        temperature = ThreadLocalRandom.current().nextInt(70) - 35;
+        amount = ThreadLocalRandom.current().nextInt(100);
     }
 
     /**

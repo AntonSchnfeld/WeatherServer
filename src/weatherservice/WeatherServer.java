@@ -3,6 +3,8 @@ package weatherservice;
 import netzklassen.Server;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static weatherservice.WeatherProtocol.*;
 
@@ -10,36 +12,30 @@ public class WeatherServer extends Server {
     private final SerializationService<WeatherData> weatherSerialization;
     private final SerializationService<City> citySerialization;
     private final Map<String, ClientMessageHandler> handlerMap;
-    private final Map<City, WeatherData> weatherDataMap;
+    private final WeatherDataStore weatherDataStore;
 
     public WeatherServer(int pPort) {
         super(pPort);
         weatherSerialization = new WeatherDataSerializationService();
         citySerialization = new CitySerializationService();
         handlerMap = new HashMap<>();
-        weatherDataMap = new HashMap<>();
+        weatherDataStore = new WeatherDataStore();
 
         handlerMap.put(CLIENT_REQUEST_RANDOM, this::handleCRR);
         handlerMap.put(CLIENT_REQUEST_SPECIFIC, this::handleCRS);
         handlerMap.put(CLIENT_REQUEST_CITIES, this::handleCRC);
-
-        for (String cityName : City.CITY_NAMES) {
-            weatherDataMap.put(new City(cityName), new WeatherData());
-        }
     }
 
     private void handleCRR(Server server, String ip, int port, String clientMsg) {
-        Set<City> cities = weatherDataMap.keySet();
-        City randomCity = null;
-        int i = 0, random = (int) (Math.random() * (cities.size() - 1));
-        for (City c : cities) {
-            if (i == random) {
-                randomCity = c;
-                break;
-            }
-            i++;
-        }
-        String serializedWeather = weatherSerialization.serialize(weatherDataMap.get(randomCity));
+        List<City> cities = weatherDataStore.getAllWeatherData()
+                .keySet()
+                .stream()
+                .toList();
+
+        City randomCity = cities.get(ThreadLocalRandom.current().nextInt(cities.size()));
+        WeatherData weatherData = weatherDataStore.getWeatherData(randomCity);
+
+        String serializedWeather = weatherSerialization.serialize(weatherData);
         String serializedCity = citySerialization.serialize(randomCity);
         send(ip, port, buildMessage(SERVER_ANSWER_RANDOM, serializedCity, serializedWeather));
     }
@@ -48,21 +44,20 @@ public class WeatherServer extends Server {
         String[] msgParts = clientMsg.split(SEPARATOR);
 
         City city = citySerialization.deserialize(msgParts[1]);
-        if (!weatherDataMap.containsKey(city)) weatherDataMap.put(city, new WeatherData());
+        if (!weatherDataStore.containsCity(city))
+            weatherDataStore.updateWeatherData(city, new WeatherData());
 
-        String serializedWeather = weatherSerialization.serialize(weatherDataMap.get(city));
+        WeatherData weatherData = weatherDataStore.getWeatherData(city);
+        String serializedWeather = weatherSerialization.serialize(weatherData);
         send(ip, port, buildMessage(SERVER_ANSWER_SPECIFIC, serializedWeather));
     }
 
     private void handleCRC(Server server, String ip, int port, String clientMsg) {
-        Set<City> cities = weatherDataMap.keySet();
-        StringBuilder stringBuilder = new StringBuilder();
-        Iterator<City> cityIterator = cities.iterator();
-        for (City city = cityIterator.next(); cityIterator.hasNext(); city = cityIterator.next()) {
-            stringBuilder.append(citySerialization.serialize(city));
-            if (cityIterator.hasNext()) stringBuilder.append(SEPARATOR);
-        }
-        send(ip, port, buildMessage(SERVER_ANSWER_CITIES, stringBuilder.toString()));
+        String citiesSerialized = weatherDataStore.getAllWeatherData().keySet().stream()
+                .map(citySerialization::serialize)
+                .collect(Collectors.joining(SEPARATOR));
+
+        send(ip, port, buildMessage(SERVER_ANSWER_CITIES, citiesSerialized));
     }
 
     @Override
