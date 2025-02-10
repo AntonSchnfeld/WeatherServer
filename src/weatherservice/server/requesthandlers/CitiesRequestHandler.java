@@ -2,11 +2,7 @@ package weatherservice.server.requesthandlers;
 
 import weatherservice.data.City;
 import weatherservice.data.SerializationService;
-import weatherservice.data.WeatherData;
-import weatherservice.server.WeatherDataStore;
-import weatherservice.server.WeatherRequest;
-import weatherservice.server.WeatherRequestProcessor;
-import weatherservice.server.WeatherServer;
+import weatherservice.server.*;
 
 import java.util.stream.Collectors;
 
@@ -14,20 +10,29 @@ import static weatherservice.WeatherProtocol.*;
 
 public class CitiesRequestHandler
         implements WeatherRequestProcessor.WeatherRequestHandler {
-    @Override
-    public void handle(WeatherServer server, WeatherRequest request,
-                       SerializationService<City> citySerialization,
-                       SerializationService<WeatherData> weatherSerialization) {
 
-        WeatherDataStore weatherDataStore = server.getWeatherDataStore();
-        String citiesSerialized = weatherDataStore
+    private final WeatherDataStore dataStore;
+    private final SerializationService<City> citySerialization;
+    private final MessageSender sender;
+
+    public CitiesRequestHandler(WeatherDataStore dataStore,
+                                MessageSender sender,
+                                SerializationService<City> citySerialization) {
+        this.dataStore = dataStore;
+        this.sender = sender;
+        this.citySerialization = citySerialization;
+    }
+
+    @Override
+    public void handle(WeatherRequest request) {
+        String citiesSerialized = dataStore
                 .getAllWeatherData()
                 .keySet()
                 .stream()
                 .map(citySerialization::serialize)
                 .collect(Collectors.joining(SEPARATOR));
 
-        server.send(request.getIp(), request.getPort(),
+        sender.send(request.getIp(), request.getPort(),
                 buildMessage(SERVER_ANSWER_CITIES, citiesSerialized));
     }
 }

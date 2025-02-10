@@ -1,7 +1,5 @@
 package weatherservice.data;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * Repräsentiert eine Stadt mit einem Namen.
  * Falls kein Name angegeben wird, wird ein zufälliger Name aus einer vordefinierten Liste gewählt.
@@ -14,24 +12,8 @@ public class City {
             "Washington DC", "New York", "Paris", "Venedig"
     };
 
-    /**
-     * Gibt einen zufälligen Städtenamen aus der vordefinierten Liste zurück.
-     *
-     * @return Ein zufällig gewählter Städtename.
-     */
-    protected static String getRandomCityName() {
-        return CITY_NAMES[ThreadLocalRandom.current().nextInt(CITY_NAMES.length)];
-    }
-
     /** Der Name der Stadt. */
     protected final String name;
-
-    /**
-     * Erstellt eine neue Stadt mit einem zufällig gewählten Namen.
-     */
-    public City() {
-        this.name = getRandomCityName();
-    }
 
     /**
      * Erstellt eine neue Stadt mit einem angegebenen Namen.

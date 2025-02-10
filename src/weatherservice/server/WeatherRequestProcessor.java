@@ -1,6 +1,6 @@
 package weatherservice.server;
 
-import weatherservice.InvalidWeatherRequestException;
+import weatherservice.exceptions.InvalidWeatherRequestException;
 import weatherservice.data.City;
 import weatherservice.data.SerializationService;
 import weatherservice.data.WeatherData;
@@ -12,21 +12,19 @@ import java.util.Map;
 import static weatherservice.WeatherProtocol.*;
 
 public class WeatherRequestProcessor {
-    private final WeatherServer server;
     private final Map<String, WeatherRequestHandler> handlerMap;
-    private final SerializationService<City> citySerialization;
-    private final SerializationService<WeatherData> weatherSerialization;
 
-    public WeatherRequestProcessor(WeatherServer server,
+    public WeatherRequestProcessor(MessageSender sender,
                                    SerializationService<City> citySerialization,
                                    SerializationService<WeatherData> weatherSerialization) {
-        this.server = server;
-        this.citySerialization = citySerialization;
-        this.weatherSerialization = weatherSerialization;
+        WeatherDataStore dataStore = new WeatherDataStore();
         handlerMap = Map.of(
-                CLIENT_REQUEST_SPECIFIC, new SpecificWeatherRequestHandler(),
-                CLIENT_REQUEST_RANDOM, new RandomWeatherRequestHandler(),
-                CLIENT_REQUEST_CITIES, new CitiesRequestHandler()
+                CLIENT_REQUEST_SPECIFIC,
+                new SpecificWeatherRequestHandler(dataStore, sender, weatherSerialization, citySerialization),
+                CLIENT_REQUEST_RANDOM,
+                new RandomWeatherRequestHandler(dataStore, sender, weatherSerialization, citySerialization),
+                CLIENT_REQUEST_CITIES,
+                new CitiesRequestHandler(dataStore, sender, citySerialization)
         );
     }
 
@@ -37,12 +35,10 @@ public class WeatherRequestProcessor {
         if (requestHandler == null)
             throw new InvalidWeatherRequestException("Invalid message command: " + command);
 
-        requestHandler.handle(server, request, citySerialization, weatherSerialization);
+        requestHandler.handle(request);
     }
 
     public interface WeatherRequestHandler {
-        void handle(WeatherServer server, WeatherRequest request,
-                    SerializationService<City> citySerialization,
-                    SerializationService<WeatherData> weatherSerialization);
+        void handle(WeatherRequest request);
     }
 }

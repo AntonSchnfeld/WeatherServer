@@ -3,10 +3,7 @@ package weatherservice.server.requesthandlers;
 import weatherservice.data.City;
 import weatherservice.data.SerializationService;
 import weatherservice.data.WeatherData;
-import weatherservice.server.WeatherDataStore;
-import weatherservice.server.WeatherRequest;
-import weatherservice.server.WeatherRequestProcessor;
-import weatherservice.server.WeatherServer;
+import weatherservice.server.*;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,24 +13,36 @@ import static weatherservice.WeatherProtocol.buildMessage;
 
 public class RandomWeatherRequestHandler
         implements WeatherRequestProcessor.WeatherRequestHandler {
-    @Override
-    public void handle(WeatherServer server, WeatherRequest request,
-                       SerializationService<City> citySerialization,
-                       SerializationService<WeatherData> weatherSerialization) {
+    private final SerializationService<City> citySerialization;
+    private final SerializationService<WeatherData> weatherSerialization;
+    private final WeatherDataStore dataStore;
+    private final MessageSender sender;
 
-        WeatherDataStore weatherDataStore = new WeatherDataStore();
-        List<City> cities = weatherDataStore.getAllWeatherData()
+    public RandomWeatherRequestHandler(WeatherDataStore dataStore,
+                                       MessageSender sender,
+                                       SerializationService<WeatherData> weatherSerialization,
+                                       SerializationService<City> citySerialization) {
+        this.citySerialization = citySerialization;
+        this.sender = sender;
+        this.weatherSerialization = weatherSerialization;
+        this.dataStore = dataStore;
+    }
+
+    @Override
+    public void handle(WeatherRequest request) {
+
+        List<City> cities = dataStore.getAllWeatherData()
                 .keySet()
                 .stream()
                 .toList();
 
         City randomCity = cities.get(ThreadLocalRandom.current().nextInt(cities.size()));
-        WeatherData weatherData = weatherDataStore.getWeatherData(randomCity);
+        WeatherData weatherData = dataStore.getWeatherData(randomCity);
 
         String serializedWeather = weatherSerialization.serialize(weatherData);
         String serializedCity = citySerialization.serialize(randomCity);
 
-        server.send(request.getIp(), request.getPort(),
+        sender.send(request.getIp(), request.getPort(),
                 buildMessage(SERVER_ANSWER_RANDOM, serializedCity, serializedWeather));
     }
 }
